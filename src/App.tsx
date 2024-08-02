@@ -1,16 +1,18 @@
-import { useReducer } from "react"
+import { useEffect, useReducer } from "react"
 import Header from "./components/Header"
 import Guitar from "./components/Guitar"
-import { useCart } from "./hooks/useCart"
 import { cartReducer, initialState } from "./reducers/cart-reducer"
 
 function App() {
 
-  const {
-    vaciarCarrito,
-    } = useCart()
-
   const [state, dispatch] = useReducer(cartReducer, initialState)
+
+  // Guardar en local storage con useEffect ya que este actualiza al momento
+  //Esto dice, cada que cart cambie, porque es lo que esta en el arreglo al final,
+  //entonces ejecuta el codigo de adentro.
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(state.cart))// 2- Ejecuta esto!
+  }, [state.cart])// 1- Detecta un cambio en esta linea
 
   
 //------- HTML -------
@@ -19,7 +21,6 @@ function App() {
     <Header 
       cart={state.cart}
       dispatch={dispatch}
-      vaciarCarrito={vaciarCarrito}
     />
 
     <main className="container-xl mt-5">

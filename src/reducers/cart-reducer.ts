@@ -15,9 +15,16 @@ export type CartState = {
     cart: CartItem[]
 }
 
+// Esta arrow function revisa si hay algo en local storage para 
+  //mantener la persistencia del carrito al reiniciar la pagina.
+const initialCart = () : CartItem[] => {
+    const localStorageCart = localStorage.getItem('cart')
+    return localStorageCart ? JSON.parse(localStorageCart) : []
+}
+
 export const initialState : CartState = {
     data: db,
-    cart: []
+    cart: initialCart()
 }
 
     const MAX_ITEMS = 10
@@ -99,8 +106,10 @@ export const cartReducer = (
     }
 
     if(actions.type === "vaciar-carrito"){
+        
         return {
-            ...state
+            ...state,
+            cart: []
         }
     }
 

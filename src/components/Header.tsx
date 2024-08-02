@@ -6,15 +6,10 @@ import { CartActions } from "../reducers/cart-reducer"
 interface HeaderProps {
     cart : CartItem[]
     dispatch: Dispatch<CartActions>
-    vaciarCarrito: () => void
 }
 
-export default function Header({ 
-        cart, 
-        dispatch,
-        vaciarCarrito
-    } : HeaderProps) {
-
+export default function Header({ cart, dispatch, } : HeaderProps) {
+    
     const estaVacioElCarrito = useMemo( () => cart.length === 0, [cart])// Esto devuelve true o false
     const cartTotal = useMemo(() => cart.reduce((total, item) => total + (item.quantity * item.price), 0), [cart])
 
@@ -100,7 +95,7 @@ export default function Header({
                                 <p className="text-end">Total pagar: <span className="fw-bold">${cartTotal}</span></p>
                                 <button 
                                 className="btn btn-dark w-100 mt-3 p-2"
-                                onClick={vaciarCarrito}
+                                onClick={() => dispatch({type: "vaciar-carrito"})}
                                 >Vaciar Carrito</button>
                                 </>
                             )}
