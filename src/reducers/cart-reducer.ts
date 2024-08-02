@@ -20,6 +20,9 @@ export const initialState : CartState = {
     cart: []
 }
 
+    const MAX_ITEMS = 10
+    const MIN_ITEMS = 1
+
 // Funciones del cartReducer
 export const cartReducer = (
     state: CartState = initialState,
@@ -27,25 +30,74 @@ export const cartReducer = (
 ) => {
 
     if(actions.type === "add-to-cart"){
+        const itemExist = state.cart.find((guitar) => guitar.id === actions.payload.item.id)
+
+        let updatedCart : CartItem[] = []
+        if(itemExist){
+           updatedCart = state.cart.map(item => {
+                if(item.id === actions.payload.item.id){
+                    if(item.quantity < MAX_ITEMS){
+                        return {...item, quantity: item.quantity + 1}
+                    }else{
+                        return item
+                    }
+                }else{
+                    return item
+                }
+           })
+        }else{
+            const newItem : CartItem = {...actions.payload.item, quantity : 1}
+            updatedCart = [...state.cart, newItem]
+        }
+
         return {
-            ...state
+            ...state,
+            cart: updatedCart
         }
     }
+
     if(actions.type === "remove-from-cart"){
+        const updatedCart = state.cart.filter( item => item.id !== actions.payload.id)
         return {
-            ...state
+            ...state,
+            cart: updatedCart
         }
     }
+
     if(actions.type === "decrease-quantity"){
+        const updatedCart = state.cart.map( item => {
+            if(item.id === actions.payload.id && item.quantity !== MIN_ITEMS){
+              return {
+                ...item,
+                quantity: item.quantity - 1
+              }
+            }
+            return item
+          })
+
         return {
-            ...state
+            ...state,
+            cart: updatedCart
         }
     }
+
     if(actions.type === "increase-quantity"){
+        const updatedCart = state.cart.map( item => {
+            if(item.id === actions.payload.id && item.quantity < MAX_ITEMS){
+              return{
+                ...item,//esto retorna los otros atributos de guitar como estan, y solo modifica quantity
+                quantity: item.quantity + 1
+              }
+            }
+            return item
+          })
+
         return {
-            ...state
+            ...state,
+            cart: updatedCart
         }
     }
+
     if(actions.type === "vaciar-carrito"){
         return {
             ...state

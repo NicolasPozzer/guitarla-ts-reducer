@@ -1,25 +1,22 @@
 //import { Fragment } from "react" // Sirve para no repetir muchos div
+import { Dispatch, useMemo } from "react"
 import type { CartItem } from "../types/guitarType"
+import { CartActions } from "../reducers/cart-reducer"
 
 interface HeaderProps {
     cart : CartItem[]
-    removeFromCart: (id: number) => void
-    decreaseQuantity: (id: number) => void
-    increaseQuantity: (id: number) => void
+    dispatch: Dispatch<CartActions>
     vaciarCarrito: () => void
-    estaVacioElCarrito: boolean
-    cartTotal: number
 }
 
 export default function Header({ 
         cart, 
-        removeFromCart, 
-        decreaseQuantity,
-        increaseQuantity, 
-        vaciarCarrito, 
-        estaVacioElCarrito, 
-        cartTotal 
+        dispatch,
+        vaciarCarrito
     } : HeaderProps) {
+
+    const estaVacioElCarrito = useMemo( () => cart.length === 0, [cart])// Esto devuelve true o false
+    const cartTotal = useMemo(() => cart.reduce((total, item) => total + (item.quantity * item.price), 0), [cart])
 
     //El return debe estar siempre, y es el que se va a mostrar en pantalla
     return (
@@ -66,7 +63,9 @@ export default function Header({
                                                         <button
                                                             type="button"
                                                             className="btn btn-dark"
-                                                            onClick={() => decreaseQuantity(guitar.id)}
+                                                            onClick={() => dispatch({type: "decrease-quantity",
+                                                                payload: {id: guitar.id}
+                                                            })}
                                                         >
                                                             -
                                                         </button>
@@ -74,7 +73,8 @@ export default function Header({
                                                         <button
                                                             type="button"
                                                             className="btn btn-dark"
-                                                            onClick={() => increaseQuantity(guitar.id)}
+                                                            onClick={() => dispatch({type: "increase-quantity", 
+                                                                            payload: {id: guitar.id}})}
                                                         >
                                                             +
                                                         </button>
@@ -84,7 +84,9 @@ export default function Header({
                                                             className="btn btn-danger"
                                                             type="button"
                                                             // Se agrega el callBack -> "() =>" porque la funcion toma un parametro
-                                                            onClick={() => removeFromCart(guitar.id)}
+                                                            onClick={() => dispatch({type: "remove-from-cart",
+                                                                payload : { id: guitar.id}
+                                                             })}
                                                         >
                                                             X
                                                         </button>

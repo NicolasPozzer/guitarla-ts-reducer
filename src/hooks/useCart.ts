@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react"
-import { db } from '../data/db'
 import type { Guitar, CartItem } from "../types/guitarType"
 
 export function useCart(){
@@ -10,8 +9,6 @@ export function useCart(){
     const localStorageCart = localStorage.getItem('cart')
     return localStorageCart ? JSON.parse(localStorageCart) : []
   }
-
-  const [data] = useState(db)
   const [cart, setCart] = useState(initialCart)
 
   const MAX_ITEMS = 10
@@ -24,35 +21,6 @@ export function useCart(){
     localStorage.setItem('cart', JSON.stringify(cart))// 2- Ejecuta esto!
   }, [cart])// 1- Detecta un cambio en esta linea
 
-  // Funcion para agregar al carrito
-  function addToCart(item : Guitar){
-
-    //crear condicional para no duplicar elementos en el carrito
-    // findIndex -> retorna el valor en el indice del arreglo,
-    //como cart esta vacio, agrega -1 a los que no estan en el
-    //carrito de guitarras, pero sino agrega un numero positivo
-    //entonces con un condicional mayor a 0 descarto los que ya estan
-    //en el carrito.
-    const itemExist = cart.findIndex((guitar) => guitar.id === item.id)
-
-    if(itemExist >= 0){
-      //condicional para no pasarse del maximo de itms en el carrito
-      if(cart[itemExist].quantity >= MAX_ITEMS) return
-      // para crear una acumulacion de un atributo del objeto
-      //primero hay que crear una copia del objeto
-      const updatedCart = [...cart]
-      updatedCart[itemExist].quantity++
-      setCart(updatedCart)
-    }else{
-      const newItem : CartItem = {...item, quantity : 1}
-      setCart([...cart, newItem])
-    }
-  }
-
-  //Eliminar un producto del carrito
-  function removeFromCart(id : number){
-    setCart(prevCart => prevCart.filter(guitar => guitar.id !== id))
-  }
 
   //incrementar cantidad de un producto
   function increaseQuantity(id : number){
@@ -88,23 +56,14 @@ export function useCart(){
     setCart([])
   }
 
-  // State Derivado - use memo se ejecuta cada vez que el carrito cambia, por eso va cart a lo ultimo.
-  const estaVacioElCarrito = useMemo( () => cart.length === 0, [cart])// Esto devuelve true o false
-  // El array method .reduce toma dos valores, el primero es el acumulado, y el
-  //segundo es el item osea el elemento actual. y el 0 al final, es el valor inicial.
-  const cartTotal = useMemo(() => cart.reduce((total, item) => total + (item.quantity * item.price), 0), [cart])
+  
 
     // Siempre retorna algo y tiene que ser un objeto osea con {}
     return {
-        data,
         cart,
-        addToCart,
-        removeFromCart,
         increaseQuantity,
         decreaseQuantity,
-        vaciarCarrito,
-        estaVacioElCarrito,
-        cartTotal
+        vaciarCarrito
     }
     
 }
